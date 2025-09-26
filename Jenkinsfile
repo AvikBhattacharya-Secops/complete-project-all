@@ -4,7 +4,6 @@ pipeline {
     environment {
         // Jenkins credentials
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-creds')            // DockerHub
-        AWS_CREDENTIALS = credentials('aws-ecr-creds')                     // AWS credentials for ECR
         GIT_CREDENTIALS = credentials('GitAccess')                         // GitHub access
         ARGOCD_CREDENTIALS = credentials('argocd')                         // ArgoCD access
 
@@ -45,6 +44,7 @@ pipeline {
                     sh """
                         echo "${DOCKERHUB_CREDENTIALS_PSW}" | docker login -u "${DOCKERHUB_CREDENTIALS_USR}" --password-stdin
                         docker push ${DOCKERHUB_REPO}:${IMAGE_TAG}
+                        docker logout
                     """
                 }
             }
@@ -54,10 +54,14 @@ pipeline {
             steps {
                 script {
                     echo "Logging in and pushing to AWS ECR..."
-                    withEnv(["AWS_ACCESS_KEY_ID=${AWS_CREDENTIALS_USR}", "AWS_SECRET_ACCESS_KEY=${AWS_CREDENTIALS_PSW}"]) {
+                    withCredentials([usernamePassword(credentialsId: 'aws-ecr-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         sh """
+                            aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+                            aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+                            aws configure set default.region ${REGION}
                             aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com
                             docker push ${ECR_REPO}:${IMAGE_TAG}
+                            docker logout
                         """
                     }
                 }
@@ -105,6 +109,15 @@ pipeline {
                     }
                 }
             }
+        }
+    }
+
+    post {
+        failure {
+            echo 'Build failed. Check logs for details.'
+        }
+        always {
+            cleanWs()
         }
     }
 }
