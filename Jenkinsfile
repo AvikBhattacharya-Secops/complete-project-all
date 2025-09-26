@@ -4,7 +4,7 @@ pipeline {
     environment {
         // Jenkins credentials
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-creds')            // DockerHub
-        AWS_CREDENTIALS = credentials('aws-credientials')                  // AWS credentials for ECR
+        AWS_CREDENTIALS = credentials('aws-ecr-creds')                     // AWS credentials for ECR
         GIT_CREDENTIALS = credentials('GitAccess')                         // GitHub access
         ARGOCD_CREDENTIALS = credentials('argocd')                         // ArgoCD access
 
