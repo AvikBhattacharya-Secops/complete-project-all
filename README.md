@@ -1,2 +1,5 @@
-# complete-project-all
-Jenkinsfile to build an image Deploy it k8s cluster using jenkins CI and use CD as argocd with the help of helm and make sure it balances load in case of any spike.
+# Multi Stage Docker Build
+
+The main purpose of choosing a golang based applciation to demostrate this example is golang is a statically-typed programming language that does not require a runtime in the traditional sense. Unlike dynamically-typed languages like Python, Ruby, and JavaScript, which rely on a runtime environment to execute their code, Go compiles directly to machine code, which can then be executed directly by the operating system.
+
+So the real advantage of multi stage docker build and distro less images can be understand with a drastic decrease in the Image size.
