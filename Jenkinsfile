@@ -21,7 +21,10 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git credentialsId: "${GIT_CREDENTIALS}", url: 'https://github.com/AvikBhattacharya-Secops/complete-project-all.git'
+                script {
+                    echo "Cloning from GitHub main branch..."
+                    git branch: 'main', credentialsId: 'GitAccess', url: 'https://github.com/AvikBhattacharya-Secops/complete-project-all.git'
+                }
             }
         }
 
@@ -77,13 +80,15 @@ pipeline {
             steps {
                 script {
                     echo "Committing and pushing Helm changes to GitHub..."
-                    sh """
-                        git config user.email 'ci@jenkins.com'
-                        git config user.name 'Jenkins CI'
-                        git add helm/values.yaml
-                        git commit -m 'Update image tag to ${IMAGE_TAG}' || echo 'No changes to commit'
-                        git push origin main
-                    """
+                    withCredentials([usernamePassword(credentialsId: 'GitAccess', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASSWORD')]) {
+                        sh """
+                            git config user.email 'ci@jenkins.com'
+                            git config user.name 'Jenkins CI'
+                            git add helm/values.yaml
+                            git diff --cached --quiet || git commit -m 'Update image tag to ${IMAGE_TAG}'
+                            git push https://${GIT_USER}:${GIT_PASSWORD}@github.com/AvikBhattacharya-Secops/complete-project-all.git main
+                        """
+                    }
                 }
             }
         }
