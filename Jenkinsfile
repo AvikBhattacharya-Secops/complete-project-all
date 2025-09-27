@@ -14,6 +14,7 @@ pipeline {
         ECR_REPO = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/my-repo"
         DOCKERHUB_REPO = 'avikbhattacharya056/my-calculator-image'
         ARGOCD_SERVER = '43.205.213.117:32506'
+        GITHUB_REPO = 'https://github.com/AvikBhattacharya-Secops/complete-project-all.git' // GitHub Repo URL
     }
 
     stages {
@@ -21,7 +22,14 @@ pipeline {
             steps {
                 script {
                     echo "Cloning from GitHub main branch..."
-                    git branch: 'main', credentialsId: 'GitAccess', url: 'https://github.com/AvikBhattacharya-Secops/complete-project-all.git'
+                    // Using Git credentials securely from Jenkins
+                    withCredentials([usernamePassword(credentialsId: 'GitAccess', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASSWORD')]) {
+                        sh """
+                            git config --global user.email 'ci@jenkins.com'
+                            git config --global user.name 'Jenkins CI'
+                            git clone https://$GIT_USER:$GIT_PASSWORD@github.com/AvikBhattacharya-Secops/complete-project-all.git
+                        """
+                    }
                 }
             }
         }
@@ -87,8 +95,8 @@ pipeline {
                             git add helm/values.yaml
                             git diff --cached --quiet || git commit -m 'Update image tag to ${IMAGE_TAG}'
                             
-                            # Correcting the remote URL for GitHub (fixing the malformed URL issue)
-                            git remote set-url origin https://${GIT_USER}:${GIT_PASSWORD}@github.com/AvikBhattacharya-Secops/complete-project-all.git
+                            # Securely using credentials for GitHub URL
+                            git remote set-url origin https://$GIT_USER:$GIT_PASSWORD@github.com/AvikBhattacharya-Secops/complete-project-all.git
                             
                             # Pushing the changes securely
                             git push origin main
