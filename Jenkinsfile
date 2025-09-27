@@ -87,7 +87,8 @@ pipeline {
                             git config user.name 'Jenkins CI'
                             git add helm/values.yaml
                             git diff --cached --quiet || git commit -m 'Update image tag to ${IMAGE_TAG}'
-                            git push https://github.com/AvikBhattacharya-Secops/complete-project-all.git main
+                            git remote set-url origin https://$GIT_USER:$GIT_PASSWORD@github.com/AvikBhattacharya-Secops/complete-project-all.git
+                            git push origin main
                         """
                     }
                 }
