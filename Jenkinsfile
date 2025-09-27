@@ -13,7 +13,7 @@ pipeline {
         AWS_ACCOUNT_ID = '439110395780'
         ECR_REPO = "${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/my-repo"
         DOCKERHUB_REPO = 'avikbhattacharya056/my-calculator-image'
-        ARGOCD_SERVER = '13.126.192.52:32506'
+        ARGOCD_SERVER = '43.205.213.117:32506'
     }
 
     stages {
@@ -54,12 +54,9 @@ pipeline {
             steps {
                 script {
                     echo "Logging in and pushing to AWS ECR..."
-                    withCredentials([usernamePassword(credentialsId: 'aws-ecr-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-ecr-creds']]) {
                         sh """
-                            aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-                            aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-                            aws configure set default.region ${REGION}
-                            aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com
+                            aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR_REPO}
                             docker push ${ECR_REPO}:${IMAGE_TAG}
                             docker logout
                         """
