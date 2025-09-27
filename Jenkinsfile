@@ -22,7 +22,7 @@ pipeline {
             steps {
                 script {
                     echo "Cloning from GitHub main branch..."
-                    // Jenkins Git plugin automatically checks out the code
+                    // Checkout the repo using the Git plugin with credentials
                     checkout scm
                 }
             }
@@ -89,10 +89,7 @@ pipeline {
                             git add helm/values.yaml
                             git diff --cached --quiet || git commit -m 'Update image tag to ${IMAGE_TAG}'
                             
-                            # Use the correct GitHub credentials format
-                            git remote set-url origin https://$GIT_USER:$GIT_PASSWORD@github.com/AvikBhattacharya-Secops/complete-project-all.git
-                            
-                            # Pushing the changes securely
+                            # Use Git credentials for secure authentication
                             git push origin main
                         """
                     }
