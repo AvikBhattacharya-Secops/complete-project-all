@@ -88,7 +88,7 @@ pipeline {
                             git diff --cached --quiet || git commit -m 'Update image tag to ${IMAGE_TAG}'
                             
                             # Correcting the remote URL for GitHub (fixing the malformed URL issue)
-                            git remote set-url origin https://$GIT_USER:$GIT_PASSWORD@github.com/AvikBhattacharya-Secops/complete-project-all.git
+                            git remote set-url origin https://${GIT_USER}:${GIT_PASSWORD}@github.com/AvikBhattacharya-Secops/complete-project-all.git
                             
                             # Pushing the changes securely
                             git push origin main
