@@ -22,14 +22,8 @@ pipeline {
             steps {
                 script {
                     echo "Cloning from GitHub main branch..."
-                    // Using Git credentials securely from Jenkins
-                    withCredentials([usernamePassword(credentialsId: 'GitAccess', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASSWORD')]) {
-                        sh """
-                            git config --global user.email 'ci@jenkins.com'
-                            git config --global user.name 'Jenkins CI'
-                            git clone https://$GIT_USER:$GIT_PASSWORD@github.com/AvikBhattacharya-Secops/complete-project-all.git
-                        """
-                    }
+                    // Jenkins Git plugin automatically checks out the code
+                    checkout scm
                 }
             }
         }
@@ -95,7 +89,7 @@ pipeline {
                             git add helm/values.yaml
                             git diff --cached --quiet || git commit -m 'Update image tag to ${IMAGE_TAG}'
                             
-                            # Securely using credentials for GitHub URL
+                            # Use the correct GitHub credentials format
                             git remote set-url origin https://$GIT_USER:$GIT_PASSWORD@github.com/AvikBhattacharya-Secops/complete-project-all.git
                             
                             # Pushing the changes securely
