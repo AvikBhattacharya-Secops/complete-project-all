@@ -93,8 +93,8 @@ pipeline {
                             git add helm/values.yaml
                             git diff --cached --quiet || git commit -m 'Update image tag to ${IMAGE_TAG}'
 
-                            # Push the changes to the main branch
-                            git push origin main
+                            # Push the changes using the GitHub credentials for authentication
+                            git push https://${GIT_USER}:${GIT_PASSWORD}@github.com/AvikBhattacharya-Secops/complete-project-all.git main
                         """
                     }
                 }
