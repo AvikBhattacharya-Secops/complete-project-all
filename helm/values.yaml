@@ -2,7 +2,7 @@ replicaCount: 2
 
 image:
   repository: avikbhattacharya056/my-calculator-image
-  tag: 8
+  tag: 1
   pullPolicy: Always
 
 service:
