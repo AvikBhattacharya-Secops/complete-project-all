@@ -86,10 +86,14 @@ pipeline {
                         sh """
                             git config user.email 'ci@jenkins.com'
                             git config user.name 'Jenkins CI'
+
+                            # Ensure we are on the 'main' branch before committing and pushing
+                            git checkout main || git checkout -b main  # Checkout main or create if doesn't exist
+
                             git add helm/values.yaml
                             git diff --cached --quiet || git commit -m 'Update image tag to ${IMAGE_TAG}'
-                            
-                            # Use Git credentials for secure authentication
+
+                            # Push the changes to the main branch
                             git push origin main
                         """
                     }
