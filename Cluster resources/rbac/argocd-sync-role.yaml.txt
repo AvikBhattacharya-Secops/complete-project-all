@@ -1,0 +1,22 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  # Assign a role for sync actions globally
+  name: argocd-sync-role
+rules:
+  - apiGroups: ["argoproj.io"]
+    resources: ["applications"]
+    verbs: ["sync", "get", "list", "create", "update", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: argocd-sync-rolebinding
+subjects:
+  - kind: User
+    name: admin  # This is your user; change if necessary
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: argocd-sync-role
+  apiGroup: rbac.authorization.k8s.io
