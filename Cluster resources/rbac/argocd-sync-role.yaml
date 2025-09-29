@@ -1,22 +1,21 @@
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+apiVersion: argoproj.io/v1alpha1
+kind: Application
 metadata:
-  # Assign a role for sync actions globally
-  name: argocd-sync-role
-rules:
-  - apiGroups: ["argoproj.io"]
-    resources: ["applications"]
-    verbs: ["sync", "get", "list", "create", "update", "delete"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: argocd-sync-rolebinding
-subjects:
-  - kind: User
-    name: admin  # This is your user; change if necessary
-    apiGroup: rbac.authorization.k8s.io
-roleRef:
-  kind: ClusterRole
-  name: argocd-sync-role
-  apiGroup: rbac.authorization.k8s.io
+  name: argocd-cluster-rbac
+  namespace: argocd  # This is the namespace where Argo CD is installed
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system  # Namespace is ignored for cluster-scoped resources
+  project: default
+  source:
+    repoURL: https://github.com/AvikBhattacharya-Secops/complete-project-all
+    targetRevision: main
+    path: Cluster resources/rbac
+    syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
+
